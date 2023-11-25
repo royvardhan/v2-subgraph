@@ -1,10 +1,10 @@
 /* eslint-disable prefer-const */
 import { log, BigInt, BigDecimal, Address, ethereum } from '@graphprotocol/graph-ts'
-import { ERC20 } from '../types/Factory/ERC20'
-import { ERC20SymbolBytes } from '../types/Factory/ERC20SymbolBytes'
-import { ERC20NameBytes } from '../types/Factory/ERC20NameBytes'
-import { User, Bundle, Token, LiquidityPosition, LiquidityPositionSnapshot, Pair } from '../types/schema'
-import { Factory as FactoryContract } from '../types/templates/Pair/Factory'
+import { ERC20 } from '../../generated/Factory/ERC20'
+import { ERC20SymbolBytes } from '../../generated/Factory/ERC20SymbolBytes'
+import { ERC20NameBytes } from '../../generated/Factory/ERC20NameBytes'
+import { User, Bundle, Token, LiquidityPosition, LiquidityPositionSnapshot, Pair } from '../../generated/schema'
+import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 import { TokenDefinition } from './tokenDefinition'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
@@ -113,11 +113,9 @@ export function fetchTokenName(tokenAddress: Address): string {
   return nameValue
 }
 
-// HOT FIX: we cant implement try catch for overflow catching so skip total supply parsing on these tokens that overflow 
-// TODO: find better way to handle overflow 
-let SKIP_TOTAL_SUPPLY: string[] = [
-  "0x0000000000bf2686748e1c0255036e7617e7e8a5"
-]
+// HOT FIX: we cant implement try catch for overflow catching so skip total supply parsing on these tokens that overflow
+// TODO: find better way to handle overflow
+let SKIP_TOTAL_SUPPLY: string[] = ['0x0000000000bf2686748e1c0255036e7617e7e8a5']
 
 export function fetchTokenTotalSupply(tokenAddress: Address): BigInt {
   if (SKIP_TOTAL_SUPPLY.includes(tokenAddress.toHexString())) {
