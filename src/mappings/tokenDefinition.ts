@@ -1,11 +1,8 @@
-import {
-  Address,
-  BigInt,
-} from "@graphprotocol/graph-ts"
+import { Address, BigInt } from '@graphprotocol/graph-ts'
 
 // Initialize a Token Definition with the attributes
 export class TokenDefinition {
-  address : Address
+  address: Address
   symbol: string
   name: string
   decimals: BigInt
@@ -80,14 +77,14 @@ export class TokenDefinition {
   }
 
   // Helper for hardcoded tokens
-  static fromAddress(tokenAddress: Address) : TokenDefinition | null {
+  static fromAddress(tokenAddress: Address): TokenDefinition | null {
     let staticDefinitions = this.getStaticDefinitions()
     let tokenAddressHex = tokenAddress.toHexString()
 
     // Search the definition using the address
     for (let i = 0; i < staticDefinitions.length; i++) {
       let staticDefinition = staticDefinitions[i]
-      if(staticDefinition.address.toHexString() == tokenAddressHex) {
+      if (staticDefinition.address.toHexString() == tokenAddressHex) {
         return staticDefinition
       }
     }
@@ -95,5 +92,4 @@ export class TokenDefinition {
     // If not found, return null
     return null
   }
-
 }
