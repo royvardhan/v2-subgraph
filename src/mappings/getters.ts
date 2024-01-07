@@ -117,32 +117,3 @@ export function getOrCreateTransaction(event: ethereum.Event): Transaction {
 
   return transaction as Transaction
 }
-
-export function getOrCreateBurn(event: BurnEvent): Burn {
-  let burn = Burn.load(
-    event.transaction.hash
-      .toHexString()
-      .concat('-')
-      .concat(event.logIndex.toString())
-  )
-  if (burn === null) {
-    burn = new Burn(
-      event.transaction.hash
-        .toHexString()
-        .concat('-')
-        .concat(event.logIndex.toString())
-    )
-    burn.transaction = event.transaction.hash.toHexString()
-    burn.timestamp = event.block.timestamp
-    burn.pair = event.address.toHexString()
-    burn.liquidity = ZERO_BD
-    burn.sender = event.params.sender
-    burn.amount0 = BigDecimal.fromString(event.params.amount0.toString())
-    burn.amount1 = BigDecimal.fromString(event.params.amount1.toString())
-    burn.to = event.params.to
-    burn.logIndex = event.logIndex
-    burn.needsComplete = true
-    burn.save()
-  }
-  return burn as Burn
-}

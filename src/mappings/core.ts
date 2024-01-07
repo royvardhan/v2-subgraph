@@ -1,26 +1,13 @@
 /* eslint-disable prefer-const */
-import { BigInt, BigDecimal, store, Address } from '@graphprotocol/graph-ts'
-import {
-  Pair,
-  Token,
-  UniswapFactory,
-  Transaction,
-  Mint as MintEvent,
-  Burn as BurnEvent,
-  Swap as SwapEvent,
-  Bundle
-} from '../../generated/schema'
-import { Pair as PairContract, Mint, Burn, Swap, Transfer, Sync } from '../../generated/templates/Pair/Pair'
-import { updatePairDayData, updateTokenDayData, updateUniswapDayData, updatePairHourData } from './dayUpdates'
-import { getEthPriceInUSD, findEthPerToken, getTrackedVolumeUSD, getTrackedLiquidityUSD } from './pricing'
+import { BigInt, store } from '@graphprotocol/graph-ts'
+import { Mint as MintEvent, Burn as BurnEvent } from '../../generated/schema'
+import { Pair as PairContract, Transfer } from '../../generated/templates/Pair/Pair'
+
 import {
   convertTokenToDecimal,
   ADDRESS_ZERO,
-  FACTORY_ADDRESS,
-  ONE_BI,
   createUser,
   createLiquidityPosition,
-  ZERO_BD,
   BI_18,
   createLiquiditySnapshot
 } from './helpers'
@@ -122,8 +109,8 @@ export function handleTransfer(event: Transfer): void {
     let burns = transaction.burns
     let burn: BurnEvent
     if (burns.length > 0) {
-      let currentBurn = getOrCreateBurn(burns[burns.length - 1])
-      if (currentBurn.needsComplete) {
+      let currentBurn = BurnEvent.load(burns[burns.length - 1])
+      if (currentBurn != null && currentBurn.needsComplete) {
         burn = currentBurn as BurnEvent
       } else {
         burn = new BurnEvent(
@@ -157,8 +144,10 @@ export function handleTransfer(event: Transfer): void {
     // if this logical burn included a fee mint, account for this
     if (mints.length !== 0 && !isCompleteMint(mints[mints.length - 1])) {
       let mint = MintEvent.load(mints[mints.length - 1])
-      burn.feeTo = mint.to
-      burn.feeLiquidity = mint.liquidity
+      if (mint != null) {
+        burn.feeTo = mint.to
+        burn.feeLiquidity = mint.liquidity
+      }
       // remove the logical mint
       store.remove('Mint', mints[mints.length - 1])
       // update the transaction
